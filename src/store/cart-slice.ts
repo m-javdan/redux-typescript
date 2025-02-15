@@ -5,14 +5,14 @@ const cartSlice = createSlice({
     initialState: {
         items: [] as Product[],
         totalQuantity: 0,
+        quantity: 0,
     },
     reducers: {
         addItemToCart(
             state: { items: Product[]; totalQuantity: number; },
             action: { payload: any; type: string; }): void {
-            const newItem = action.payload;
-            const existingItems = state.items.find(item => item.id === newItem.id);
-            state.totalQuantity++;
+            const newItem: any = action.payload;
+            const existingItems: Product | undefined = state.items.find(item => item.id === newItem.id);
             if (!existingItems) {
                 state.items.push({
                     id: newItem.id,
@@ -22,7 +22,8 @@ const cartSlice = createSlice({
                     totalPrice: newItem.price,
                     image: newItem.image,
                     title: newItem.title,
-                });
+                    quantity: 1,
+                })
             } else {
                 state.totalQuantity++;
                 existingItems.totalPrice = existingItems.totalPrice + newItem.price;
@@ -30,18 +31,25 @@ const cartSlice = createSlice({
         },
         removeItemFromCart(
             state: { items: Product[]; totalQuantity: number },
-            action: { payload: any; type: string; }): void {
-            const id = action.payload;
-            const existingItems = state.items.find(item => item.id === id);
-            if (!existingItems) {
+            action: { payload: number; type: string; }
+        ): void {
+            const id: number = action.payload;
+
+            const existingItem: Product | undefined = state.items.find(
+                (item: Product): boolean => item.id === id
+            );
+            state.totalQuantity--;
+            if (!existingItem) {
                 return;
             }
-            state.totalQuantity--;
-            if (existingItems.totalQuantity && existingItems.totalQuantity === 1) {
-                state.items = state.items.filter(item => item.id !== id);
+            if (existingItem.quantity === 1) {
+                state.items = state.items.filter(
+                    (item: Product): boolean => item.id !== id
+                );
+
             } else {
                 state.totalQuantity--;
-                existingItems.totalPrice = (existingItems.totalPrice || 0 ) - existingItems.price;
+                existingItem.totalPrice = (existingItem.totalPrice || 0) - existingItem.price;
             }
         }
     }

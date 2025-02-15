@@ -1,10 +1,11 @@
 interface Product {
     category: string;
     description: string;
-    id?: number;
+    id: number;
     image?: string;
     price: number;
     title: string;
-    totalQuantity?: 0,
+    totalQuantity?: number,
     totalPrice?: number;
+    quantity: number;
 }
